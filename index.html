@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Aura - Mind, Wealth & Mastery Companion</title>
+  <meta name="theme-color" content="#7c69ef" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(145deg, #f7f5ff 0%, #edf2ff 50%, #fdf2f8 100%);
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(220, 215, 254, 0.6);
+      --primary: #7c69ef;
+      --primary-light: #ece9fe;
+      --primary-dark: #5844c8;
+      --accent-mint: #2dd4bf;
+      --accent-peach: #fb923c;
+      --accent-rose: #f43f5e;
+      --text-main: #2e2a4a;
+      --text-muted: #6b668d;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 8px;
+      --shadow-soft: 0 10px 25px -5px rgba(124, 105, 239, 0.12), 0 8px 10px -6px rgba(124, 105, 239, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding-bottom: 80px;
+    }
+
+    #app-container {
+      width: 100%;
+      max-width: 480px;
+      padding: 16px;
+      position: relative;
+    }
+
+    /* Header Profile Card */
+    .profile-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .greeting-sub {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+    }
+
+    .greeting-name {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .avatar-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a78bfa, #f472b6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.4rem;
+      box-shadow: 0 4px 12px rgba(167, 139, 250, 0.35);
+      cursor: pointer;
+    }
+
+    /* Navigation Pill Bar */
+    .nav-bar {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 440px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(220, 215, 254, 0.7);
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(88, 68, 200, 0.15);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 12px;
+      z-index: 999;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 18px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn span.icon {
+      font-size: 1.25rem;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Views container */
+    .view-section {
+      display: none;
+      animation: fadeIn 0.25s ease-out forwards;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* Water Tracker Component */
+    .water-ring-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .water-count {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #0284c7;
+    }
+
+    .water-btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-pill {
+      border: none;
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(124, 105, 239, 0.25);
+      transition: transform 0.1s ease;
+    }
+
+    .btn-pill:active {
+      transform: scale(0.96);
+    }
+
+    .btn-pill-subtle {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      box-shadow: none;
+    }
+
+    /* Affirmation Bubble */
+    .affirm-box {
+      background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+      border-left: 4px solid #c084fc;
+      padding: 14px;
+      border-radius: 12px;
+      font-style: italic;
+      color: #6b21a8;
+      font-weight: 500;
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    /* Urge Delay Tool (from PDF) */
+    .urge-box {
+      background: #fff1f2;
+      border: 1px solid #ffe4e6;
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+
+    .urge-tag {
+      background: #f43f5e;
+      color: white;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    /* Pomodoro / Deep Work */
+    .timer-display {
+      font-size: 3rem;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 2px;
+      color: var(--primary-dark);
+      margin: 12px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .mode-select {
+      display: flex;
+      background: #f1f0fb;
+      padding: 4px;
+      border-radius: 24px;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .mode-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 6px 0;
+      font-size: 0.76rem;
+      font-weight: 600;
+      border-radius: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .mode-btn.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    /* Mood Tracker */
+    .mood-selectors {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0;
+    }
+
+    .mood-choice {
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      background: none;
+      border: none;
+      padding: 6px;
+      border-radius: 50%;
+    }
+
+    .mood-choice:hover, .mood-choice.selected {
+      transform: scale(1.25);
+      background: var(--primary-light);
+    }
+
+    .strategy-card {
+      background: #fafaf9;
+      border: 1px dashed #d6d3d1;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-top: 10px;
+    }
+
+    /* Input & Forms */
+    .styled-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #dcd7fe;
+      background: white;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    .styled-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    /* Polymath Fact Box */
+    .fact-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+      border: 1px solid #bae6fd;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 10px;
+    }
+
+    .fact-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0369a1;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .fact-text {
+      font-size: 0.88rem;
+      line-height: 1.45;
+      color: #0f172a;
+    }
+
+    /* Modal / Custom Alert */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(46, 42, 74, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    /* Badge Pills for First Principles */
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 6px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+    .badge-primary { background: #ede9fe; color: #5b21b6; }
+    .badge-teal { background: #ccfbf1; color: #115e59; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- Header / Personalized Identity -->
+    <header class="profile-card">
+      <div>
+        <div class="greeting-sub">Personal Command Hub</div>
+        <div class="greeting-name">
+          <span>Hello, </span><span id="user-display-name">Harsimran</span> ✨
+        </div>
+      </div>
+      <div class="avatar-badge" onclick="openProfileModal()" title="Tap to personalize profile">
+        🧘
+      </div>
+    </header>
+
+    <!-- VIEW 1: HOME & MINDFULNESS -->
+    <main id="view-mind" class="view-section active">
+      
+      <!-- Affirmation & Positive Self-Talk -->
+      <section class="card">
+        <div class="card-title">🌸 Daily Affirmation & Power Talk</div>
+        <div class="affirm-box" id="affirmation-quote">
+          "I am patient with my path, unshakable in my effort, and kind with my inner voice today."
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button class="btn-pill btn-pill-subtle" onclick="cycleAffirmation()">New Affirmation 🔄</button>
+          <span style="font-size:0.75rem; color:var(--text-muted);">Ground your morals</span>
+        </div>
+      </section>
+
+      <!-- Hydration & Body Awareness -->
+      <section class="card">
+        <div class="card-title">💧 Hydration & Body Battery</div>
+        <div class="water-ring-box">
+          <div>
+            <div class="water-count"><span id="water-amount">0</span> / 8 <span style="font-size:1rem; color:var(--text-muted); font-weight:500;">glasses</span></div>
+            <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;" id="water-status-tip">Gentle hydration keeps your cognition sharp.</p>
+          </div>
+          <div class="water-btn-group">
+            <button class="btn-pill" onclick="addWater()">+ Glass</button>
+            <button class="btn-pill btn-pill-subtle" onclick="resetWater()">↺</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Urge Killer / 10-Minute Delay Clause (PDF Pillar 1) -->
+      <section class="card urge-box">
+        <div class="card-title" style="color:#e11d48;">
+          <span>🛑 10-Minute Impulse Pause</span>
+        </div>
+        <span class="urge-tag">PDF Blueprint Pillar 1</span>
+        <p style="font-size:0.82rem; color:#4c0519; margin-bottom:10px; line-height:1.4;">
+          Willpower is an exhaustible battery. When an urge to scroll or break focus strikes, invoke the <strong>10-Minute Delay Clause</strong>. 90% of urges dissolve once acknowledged without immediate gratification.
+        </p>
+        <div id="urge-timer-text" style="font-size:1.4rem; font-weight:800; color:#e11d48; text-align:center; margin:8px 0; display:none;">10:00</div>
+        <button id="urge-btn" class="btn-pill" style="background:#f43f5e; width:100%;" onclick="startUrgeDelay()">Start 10-Minute Urge Buffer</button>
+      </section>
+
+      <!-- Boundaries Check -->
+      <section class="card">
+        <div class="card-title">🛡️ Boundary & Overwork Guard</div>
+        <p style="font-size:0.83rem; color:var(--text-muted); margin-bottom:10px;">
+          Check yourself against mental over-extension. Are you crossing your boundaries?
+        </p>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:0.82rem;">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" onchange="checkBoundaryLimit(this, 'Saying No to unaligned demands')"> I protected my energy from low-priority demands today.
+          </label>
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" onchange="checkBoundaryLimit(this, 'Physical screen distance')"> Phone is kept in another room during intense work blocks.
+          </label>
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" onchange="checkBoundaryLimit(this, 'Speaking with self-compassion')"> Replaced harsh self-criticism with supportive guidance.
+          </label>
+        </div>
+      </section>
+    </main>
+
+    <!-- VIEW 2: STUDY & DEEP WORK (POMODORO & PDF EXECUTION) -->
+    <main id="view-study" class="view-section">
+      <section class="card">
+        <div class="card-title">⚡ Deep Work & Focus Engine</div>
+        
+        <div class="mode-select">
+          <button class="mode-btn active" onclick="setTimerMode('pomodoro', 25, this)">25m Pomodoro</button>
+          <button class="mode-btn" onclick="setTimerMode('deepwork', 90, this)">90m PDF Block</button>
+          <button class="mode-btn" onclick="setTimerMode('shortbreak', 5, this)">5m Rest</button>
+        </div>
+
+        <div class="timer-display" id="main-timer">25:00</div>
+
+        <div class="timer-controls">
+          <button class="btn-pill" id="timer-toggle-btn" onclick="toggleTimer()">Start Focus</button>
+          <button class="btn-pill btn-pill-subtle" onclick="resetTimer()">Reset</button>
+        </div>
+        <p style="font-size:0.75rem; text-align:center; color:var(--text-muted); margin-top:8px;" id="technique-tip">
+          <strong>Micro-Step Rule:</strong> Break your first task until it takes &lt; 2 mins to initiate.
+        </p>
+      </section>
+
+      <!-- PDF Execution Worksheets Log -->
+      <section class="card">
+        <div class="card-title">📋 Worksheet 2: Daily Focus Log</div>
+        <input type="text" class="styled-input" id="deepwork-p1" placeholder="Deep Work Block 1: Concrete Task..." />
+        <input type="text" class="styled-input" id="deepwork-proof" placeholder="Outcome / Verified Proof of Result..." />
+        <button class="btn-pill btn-pill-subtle" style="width:100%;" onclick="saveFocusLog()">Save Proof to Journal 💾</button>
+        <div id="log-status" style="font-size:0.75rem; color:#059669; text-align:center; margin-top:6px;"></div>
+      </section>
+
+      <!-- Study Techniques & Active Inquiry -->
+      <section class="card">
+        <div class="card-title">🧠 Polymath Study Arsenal</div>
+        <div style="font-size:0.82rem; line-height:1.45; color:var(--text-main);">
+          <div style="margin-bottom:8px;"><strong>1. Feynman Breakdown:</strong> Explain concepts simply without jargon, as if teaching a beginner.</div>
+          <div style="margin-bottom:8px;"><strong>2. First Principles Dissection:</strong> Strip away convention; break the problem to raw undeniable axioms.</div>
+          <div><strong>3. Spaced Synthesis:</strong> Test recall before consulting study materials.</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- VIEW 3: WEALTH & FIRST PRINCIPLES (FROM PDF) -->
+    <main id="view-wealth" class="view-section">
+      <section class="card">
+        <div class="card-title">💎 The 4 Wealth Levers (PDF Pillar 3)</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+          Money is a measurement of value delivered through leverage to an audience with purchasing power.
+        </p>
+        
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:0.84rem;">
+          <div style="background:#f5f3ff; padding:10px; border-radius:10px;">
+            <strong style="color:var(--primary-dark);">1. High-Value Skill</strong>
+            <p style="font-size:0.78rem; color:#4c1d95;">Solve an expensive bottleneck companies or people cannot easily solve themselves (copy, systems, code, media).</p>
+          </div>
+          <div style="background:#ecfdf5; padding:10px; border-radius:10px;">
+            <strong style="color:#065f46;">2. Specific Knowledge</strong>
+            <p style="font-size:0.78rem; color:#064e3b;">Uncommon intersections of your curiosities that cannot be outsourced or trained through standard curriculums.</p>
+          </div>
+          <div style="background:#eff6ff; padding:10px; border-radius:10px;">
+            <strong style="color:#1e40af;">3. Leverage</strong>
+            <p style="font-size:0.78rem; color:#1e3a8a;">Scalable permissionless leverage: Code, Media, Systems, Content that generates value while you rest.</p>
+          </div>
+          <div style="background:#fffbeb; padding:10px; border-radius:10px;">
+            <strong style="color:#92400e;">4. Unshakable Trust</strong>
+            <p style="font-size:0.78rem; color:#78350f;">A documented track record of delivering outcomes without excuses. Under-promise and over-deliver.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- First Principles Goal Deconstructor -->
+      <section class="card">
+        <div class="card-title">🔬 First-Principles Goal Synthesizer</div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Break any big ambition into its raw undeniable truths.</p>
+        <input type="text" class="styled-input" id="fp-target" placeholder="1. Target Outcome (e.g. ₹1 Lakh/month revenue)" />
+        <textarea class="styled-input" id="fp-truths" rows="2" placeholder="2. Fundamental Truths (e.g. 10 clients at ₹10k each, solved pain point)"></textarea>
+        <textarea class="styled-input" id="fp-leverage" rows="2" placeholder="3. Single Highest Leverage Action"></textarea>
+        <button class="btn-pill" style="width:100%;" onclick="saveFirstPrinciples()">Deconstruct & Save Goal</button>
+      </section>
+    </main>
+
+    <!-- VIEW 4: MOOD & STRATEGY RESCUE -->
+    <main id="view-mood" class="view-section">
+      <section class="card">
+        <div class="card-title">🌈 Mood & Emotional Weather</div>
+        <p style="font-size:0.82rem; color:var(--text-muted);">How is your mind feeling right now?</p>
+        <div class="mood-selectors">
+          <button class="mood-choice" onclick="selectMood('Radiant', '🔥 High momentum. Direct this peak energy toward your hardest intellectual challenge.')">🌟</button>
+          <button class="mood-choice" onclick="selectMood('Calm', '🍃 Centered state. Perfect for deliberate first-principles planning and deep study.')">🌿</button>
+          <button class="mood-choice" onclick="selectMood('Fatigued', '☕ Cognitive dip detected. Step away from blue light for 15 mins. Drink cold water.')">😴</button>
+          <button class="mood-choice" onclick="selectMood('Anxious', '🌊 Overwhelm clause: You are thinking too far ahead. Narrow down to the next 2-minute action.')">🌪️</button>
+          <button class="mood-choice" onclick="selectMood('Down', '💜 Self-compassion protocol: Pause harsh judgements. You are building something durable, day by day.')">🌧️</button>
+        </div>
+
+        <div id="mood-action-box" class="strategy-card" style="display:none;">
+          <div style="font-weight:700; color:var(--primary);" id="mood-headline">Mood Diagnostic</div>
+          <div id="mood-quick-fix" style="margin-top:4px;"></div>
+        </div>
+      </section>
+
+      <!-- Long-term Strategy Re-alignment -->
+      <section class="card">
+        <div class="card-title">🧭 Long-Term Strategy Reset</div>
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:8px;">
+          When down or unmotivated, remind yourself of the macro game:
+        </p>
+        <div style="font-size:0.8rem; line-height:1.5;">
+          <p>• <strong>Asymmetric Upside:</strong> Daily consistency compiles like compound interest. One quiet week does not ruin a decade of mastery.</p>
+          <p style="margin-top:6px;">• <strong>Daily Friction Audit:</strong> Notice where willpower wavered today and remove the trigger physically for tomorrow.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- VIEW 5: CURIOSITY & POLYMATH EXPLORATION -->
+    <main id="view-curiosity" class="view-section">
+      <section class="card">
+        <div class="card-title">🌌 Polymath Inquiry & World Sparks</div>
+        <p style="font-size:0.82rem; color:var(--text-muted);">
+          Feed your mind with high-signal interdisciplinary curiosities:
+        </p>
+
+        <div class="fact-card" id="active-fact-box">
+          <div class="fact-title" id="fact-category">Science & Physics</div>
+          <div class="fact-text" id="fact-content">
+            "Energy is quantized. Breakthroughs in quantum electrodynamics emerged not by accepting common assumptions, but by questioning why matter remains stable at atomic scales."
+          </div>
+        </div>
+
+        <button class="btn-pill btn-pill-subtle" style="width:100%; margin-top:12px;" onclick="fetchNextCuriosity()">
+          Get Next Interdisciplinary Spark ✨
+        </button>
+
+        <div style="margin-top:16px;">
+          <label style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">Inquire Deeply (Live Web Knowledge Lookup):</label>
+          <div style="display:flex; gap:8px; margin-top:6px;">
+            <input type="text" class="styled-input" id="search-query" placeholder="Ask / Look up any concept..." style="margin-bottom:0;" />
+            <button class="btn-pill" onclick="executeOnlineSearch()">Explore</button>
+          </div>
+          <div id="search-results-box" style="margin-top:10px; font-size:0.82rem; color:var(--text-main);"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="nav-bar">
+      <button class="nav-btn active" onclick="switchTab('mind', this)">
+        <span class="icon">🌸</span>
+        <span>Aura</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('study', this)">
+        <span class="icon">⏱️</span>
+        <span>Focus</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('wealth', this)">
+        <span class="icon">📈</span>
+        <span>Wealth</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('mood', this)">
+        <span class="icon">💫</span>
+        <span>Rescue</span>
+      </button>
+      <button class="nav-btn" onclick="switchTab('curiosity', this)">
+        <span class="icon">💡</span>
+        <span>Spark</span>
+      </button>
+    </nav>
+
+    <!-- Personalize Profile Modal -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal-card">
+        <h3 style="margin-bottom:8px; color:var(--primary-dark);">Personalize Your Companion</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Your name and focus are remembered locally on your device.</p>
+        <input type="text" class="styled-input" id="input-name" placeholder="Enter Your Name" />
+        <input type="text" class="styled-input" id="input-focus" placeholder="Core Project or Goal" />
+        <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
+          <button class="btn-pill" onclick="saveProfileDetails()">Save & Apply</button>
+          <button class="btn-pill btn-pill-subtle" onclick="closeProfileModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // State & Persistent Storage
+    const APP_STATE = {
+      name: localStorage.getItem('aura_username') || 'Harsimran',
+      focus: localStorage.getItem('aura_focus') || 'First Principles Mastery',
+      water: parseInt(localStorage.getItem('aura_water') || '0', 10),
+      timerRemaining: 25 * 60,
+      timerRunning: false,
+      timerInterval: null,
+      timerType: 'pomodoro',
+      urgeRemaining: 10 * 60,
+      urgeInterval: null
+    };
+
+    // Affirmation dataset
+    const AFFIRMATIONS = [
+      "I am patient with my path, unshakable in my effort, and kind with my inner voice.",
+      "Distraction is just an impulse; I have the clarity to pause and steer my focus.",
+      "Small daily compounding efforts build extraordinary mastery over time.",
+      "I protect my energy with firm boundaries. I speak to myself with dignity and strength.",
+      "My worth is not tied to fleeting hustle, but to deliberate first-principles execution."
+    ];
+    let affirmIdx = 0;
+
+    // Curiosity dataset
+    const CURIOSITIES = [
+      { cat: "Economics & Game Theory", text: "In game theory, cooperation emerges naturally in repeated interactions (tit-for-tat). Unshakable trust yields higher multi-round dividends than short-term exploitation." },
+      { cat: "Physics & Electrostatics", text: "Poisson and Laplace equations govern potential fields in regions of charge and free space. The simplest boundary conditions determine the entire state of the field." },
+      { cat: "High-Tier Leverage", text: "Code and media are zero-marginal-cost leverage. Creating high-value digital assets once allows value to scale infinitely without spending extra hours." },
+      { cat: "Cognitive Science", text: "The brain burns roughly 20% of your metabolic energy. Hydration and 10-minute micro-breaks directly refresh prefrontal cortex decision reserves." }
+    ];
+    let curiosityIdx = 0;
+
+    // Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('user-display-name').textContent = APP_STATE.name;
+      document.getElementById('water-amount').textContent = APP_STATE.water;
+      updateWaterTip();
+      
+      // Load saved worksheets if available
+      const savedTask = localStorage.getItem('aura_log_task');
+      if (savedTask) document.getElementById('deepwork-p1').value = savedTask;
+      const savedProof = localStorage.getItem('aura_log_proof');
+      if (savedProof) document.getElementById('deepwork-proof').value = savedProof;
+    });
+
+    // Navigation Switcher
+    function switchTab(tabKey, btnElement) {
+      document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      
+      const targetView = document.getElementById('view-' + tabKey);
+      if (targetView) targetView.classList.add('active');
+      if (btnElement) btnElement.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Affirmations
+    function cycleAffirmation() {
+      affirmIdx = (affirmIdx + 1) % AFFIRMATIONS.length;
+      document.getElementById('affirmation-quote').textContent = `"${AFFIRMATIONS[affirmIdx]}"`;
+    }
+
+    // Hydration
+    function addWater() {
+      if (APP_STATE.water < 8) {
+        APP_STATE.water++;
+      } else {
+        alert("💧 You have hit your 8-glass baseline hydration goal! Outstanding discipline.");
+      }
+      localStorage.setItem('aura_water', APP_STATE.water);
+      document.getElementById('water-amount').textContent = APP_STATE.water;
+      updateWaterTip();
+    }
+
+    function resetWater() {
+      APP_STATE.water = 0;
+      localStorage.setItem('aura_water', 0);
+      document.getElementById('water-amount').textContent = '0';
+      updateWaterTip();
+    }
+
+    function updateWaterTip() {
+      const tip = document.getElementById('water-status-tip');
+      if (APP_STATE.water >= 8) {
+        tip.textContent = "Optimal baseline reached. Body hydrated and alert.";
+      } else if (APP_STATE.water >= 4) {
+        tip.textContent = "Halfway there. Keep a glass nearby.";
+      } else {
+        tip.textContent = "Gentle reminder: Drink a glass to prevent cognitive sluggishness.";
+      }
+    }
+
+    // Boundaries Guard
+    function checkBoundaryLimit(checkbox, name) {
+      if (checkbox.checked) {
+        showGentleNotification(`Honored boundary: ${name}`);
+      }
+    }
+
+    // 10-Minute Delay Clause
+    function startUrgeDelay() {
+      const btn = document.getElementById('urge-btn');
+      const disp = document.getElementById('urge-timer-text');
+      if (APP_STATE.urgeInterval) return;
+
+      disp.style.display = 'block';
+      btn.disabled = true;
+      btn.textContent = "Urge Buffer Running...";
+
+      APP_STATE.urgeInterval = setInterval(() => {
+        APP_STATE.urgeRemaining--;
+        let m = Math.floor(APP_STATE.urgeRemaining / 60);
+        let s = APP_STATE.urgeRemaining % 60;
+        disp.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+        if (APP_STATE.urgeRemaining <= 0) {
+          clearInterval(APP_STATE.urgeInterval);
+          APP_STATE.urgeInterval = null;
+          APP_STATE.urgeRemaining = 10 * 60;
+          disp.textContent = "10:00";
+          disp.style.display = 'none';
+          btn.disabled = false;
+          btn.textContent = "Start 10-Minute Urge Buffer";
+          alert("🎉 10 minutes passed! Notice how the urge has dissipated. Return to your objective with clear focus.");
+        }
+      }, 1000);
+    }
+
+    // Study Timer
+    function setTimerMode(type, minutes, el) {
+      clearInterval(APP_STATE.timerInterval);
+      APP_STATE.timerRunning = false;
+      APP_STATE.timerType = type;
+      APP_STATE.timerRemaining = minutes * 60;
+      
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+
+      document.getElementById('timer-toggle-btn').textContent = "Start Focus";
+      renderTimer();
+    }
+
+    function renderTimer() {
+      const m = Math.floor(APP_STATE.timerRemaining / 60);
+      const s = APP_STATE.timerRemaining % 60;
+      document.getElementById('main-timer').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+
+    function toggleTimer() {
+      const btn = document.getElementById('timer-toggle-btn');
+      if (APP_STATE.timerRunning) {
+        clearInterval(APP_STATE.timerInterval);
+        APP_STATE.timerRunning = false;
+        btn.textContent = "Resume";
+      } else {
+        APP_STATE.timerRunning = true;
+        btn.textContent = "Pause";
+        APP_STATE.timerInterval = setInterval(() => {
+          if (APP_STATE.timerRemaining > 0) {
+            APP_STATE.timerRemaining--;
+            renderTimer();
+          } else {
+            clearInterval(APP_STATE.timerInterval);
+            APP_STATE.timerRunning = false;
+            btn.textContent = "Start Focus";
+            alert("⏰ Block finished! Step away, stretch, and audit your verified proof.");
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(APP_STATE.timerInterval);
+      APP_STATE.timerRunning = false;
+      document.getElementById('timer-toggle-btn').textContent = "Start Focus";
+      if (APP_STATE.timerType === 'deepwork') APP_STATE.timerRemaining = 90 * 60;
+      else if (APP_STATE.timerType === 'shortbreak') APP_STATE.timerRemaining = 5 * 60;
+      else APP_STATE.timerRemaining = 25 * 60;
+      renderTimer();
+    }
+
+    // Save Worksheet Focus Log
+    function saveFocusLog() {
+      const p1 = document.getElementById('deepwork-p1').value;
+      const proof = document.getElementById('deepwork-proof').value;
+      localStorage.setItem('aura_log_task', p1);
+      localStorage.setItem('aura_log_proof', proof);
+      const status = document.getElementById('log-status');
+      status.textContent = "✓ Log & proof recorded for daily audit.";
+      setTimeout(() => { status.textContent = ""; }, 3000);
+    }
+
+    // Save First Principles
+    function saveFirstPrinciples() {
+      alert("✓ First Principles Strategy synthesized! Re-evaluate every step against raw foundational truth.");
+    }
+
+    // Mood Selector
+    function selectMood(mood, advice) {
+      const box = document.getElementById('mood-action-box');
+      const headline = document.getElementById('mood-headline');
+      const fix = document.getElementById('mood-quick-fix');
+      
+      headline.textContent = `${mood} State: Tailored Calibration`;
+      fix.textContent = advice;
+      box.style.display = 'block';
+    }
+
+    // Curiosity & Online Lookup
+    function fetchNextCuriosity() {
+      curiosityIdx = (curiosityIdx + 1) % CURIOSITIES.length;
+      document.getElementById('fact-category').textContent = CURIOSITIES[curiosityIdx].cat;
+      document.getElementById('fact-content').textContent = `"${CURIOSITIES[curiosityIdx].text}"`;
+    }
+
+    async function executeOnlineSearch() {
+      const q = document.getElementById('search-query').value.trim();
+      const resBox = document.getElementById('search-results-box');
+      if (!q) {
+        resBox.innerHTML = "<span style='color:#ef4444;'>Please enter a topic to explore.</span>";
+        return;
+      }
+      resBox.innerHTML = "<em>Connecting to global open knowledge...</em>";
+      try {
+        const resp = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(q)}`);
+        if (!resp.ok) throw new Error();
+        const data = await resp.json();
+        resBox.innerHTML = `
+          <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid #dcd7fe; margin-top:6px;">
+            <strong>${data.title}</strong>
+            <p style="margin-top:4px; line-height:1.4;">${data.extract || "Concept verified."}</p>
+          </div>
+        `;
+      } catch (e) {
+        resBox.innerHTML = `
+          <div style="background:#fff; padding:8px; border-radius:8px; border:1px solid #e2e8f0;">
+            <strong>Inquiry: ${q}</strong>
+            <p style="margin-top:2px; color:var(--text-muted);">Explore connection: Break this topic into axioms using First-Principles Worksheet.</p>
+          </div>
+        `;
+      }
+    }
+
+    // Profile Settings
+    function openProfileModal() {
+      document.getElementById('input-name').value = APP_STATE.name;
+      document.getElementById('input-focus').value = APP_STATE.focus;
+      document.getElementById('profile-modal').classList.add('active');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.remove('active');
+    }
+
+    function saveProfileDetails() {
+      const n = document.getElementById('input-name').value.trim();
+      const f = document.getElementById('input-focus').value.trim();
+      if (n) {
+        APP_STATE.name = n;
+        localStorage.setItem('aura_username', n);
+        document.getElementById('user-display-name').textContent = n;
+      }
+      if (f) {
+        APP_STATE.focus = f;
+        localStorage.setItem('aura_focus', f);
+      }
+      closeProfileModal();
+    }
+
+    function showGentleNotification(msg) {
+      console.log("[Aura Companion]:", msg);
+    }
+  </script>
+</body>
+</html>
